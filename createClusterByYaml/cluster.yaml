@@ -1,0 +1,57 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: eksctl-cluster
+  region: ap-northeast-2
+  version: "1.19"
+
+vpc:
+  subnets:
+    private:
+      ap-northeast-2a: {id: subnet-069471d051bff0c9f}
+      ap-northeast-2c: {id: subnet-04222667bc47da5f9}
+  nat: 
+    gateway: Single # Disable, Single(Default), HighlyAvailable
+  clusterEndpoints:
+    privateAccess: true
+    publicAccess: true
+
+iam:
+  withOIDC: true
+
+managedNodeGroups:
+  - name: eksctl-nodegroup
+    privateNetworking: True
+    instanceType: t3.micro
+    minSize: 2
+    desiredCapacity: 2
+    maxSize: 4
+    availabilityZones: ["ap-northeast-2a", "ap-northeast-2c"]
+    volumeSize: 20
+    labels: {role: worker}
+    updateConfig:
+      maxUnavailable: 1
+# 템플릿
+    # lunchTemplate:
+    #   id: lt-1234
+    #   version: "3"
+# 보안그룹
+    # securityGroups:
+      # attachIDs: ["",""]
+    ssh:
+      allow: true
+      publicKeyPath: ./key/eksnode.pub
+      # ssh 허용 Security Group ID
+      # sourceSecurityGroupIds: [""]
+# 테인트
+    # taints:
+    # - key: key1
+    #   value: value1
+    #   effect: NoSchedule
+    tags:
+      nodegroup-role: worker
+      Name: create-by-eksctl
+    # iam:
+    #   withAddonPolicies:
+    #     externalDNS: true
