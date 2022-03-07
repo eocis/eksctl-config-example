@@ -2,11 +2,13 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: eksctl-cluster
+  name: pkm
   region: ap-northeast-2
-  version: "1.19"
+  version: "1.20"
 
 vpc:
+  # id: # string
+  # cidr: # string
   subnets:
     private:
       ap-northeast-2a: {id: subnet-069471d051bff0c9f}
@@ -20,18 +22,29 @@ vpc:
 iam:
   withOIDC: true
 
+# addons:
+#   - name: awsLoadBalancerController
+
 managedNodeGroups:
-  - name: eksctl-nodegroup
+  - name: pkm
     privateNetworking: True
-    instanceType: t3.micro
+    instanceType: t3.medium
     minSize: 2
     desiredCapacity: 2
     maxSize: 4
     availabilityZones: ["ap-northeast-2a", "ap-northeast-2c"]
     volumeSize: 20
     labels: {role: worker}
+    iam:
+      withAddonPolicies: 
+        awsLoadBalancerController: true
     updateConfig:
       maxUnavailable: 1
+    ssh:
+      allow: true
+      publicKeyPath: ./key/eksnode.pub
+      # ssh 허용 Security Group ID
+      # sourceSecurityGroupIds: [""]
 # 템플릿
     # lunchTemplate:
     #   id: lt-1234
@@ -39,11 +52,6 @@ managedNodeGroups:
 # 보안그룹
     # securityGroups:
       # attachIDs: ["",""]
-    ssh:
-      allow: true
-      publicKeyPath: ./key/eksnode.pub
-      # ssh 허용 Security Group ID
-      # sourceSecurityGroupIds: [""]
 # 테인트
     # taints:
     # - key: key1
@@ -51,7 +59,4 @@ managedNodeGroups:
     #   effect: NoSchedule
     tags:
       nodegroup-role: worker
-      Name: create-by-eksctl
-    # iam:
-    #   withAddonPolicies:
-    #     externalDNS: true
+      creater: park kung min

@@ -1,0 +1,28 @@
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: kube-example
+  name: app-ing
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: instance
+    alb.ingress.kubernetes.io/inbound-cidrs: '0.0.0.0/0'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTPS
+    alb.ingress.kubernetes.io/subnets: "	subnet-07e8f8aa0eb862f9c,subnet-0f3f5983aceaf6c5a"
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:418126497077:certificate/e669f1dc-a614-4ff0-b64f-80dd29ddebb1
+spec:
+  rules:
+    - host: kube.eocis.app
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: app-svc1
+                port: 
+                  number: 8000
+
